@@ -1,4 +1,4 @@
-\# Batch Adaptive CUDA K-Means
+# Batch Adaptive CUDA K-Means
 
 
 
@@ -18,11 +18,11 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 
 
-\## 🚀 Key Features
+## 🚀 Key Features
 
 
 
-\### 1. Adaptive Kernel Selection
+### 1. Adaptive Kernel Selection
 
 \* Automatically determines the execution mode by analyzing \*\*Sparsity\*\* upon data loading.
 
@@ -32,7 +32,7 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 
 
-\### 2. Advanced CUDA Optimizations
+### 2. Advanced CUDA Optimizations
 
 \* \*\*Memory Coalescing (AoS $\\to$ SoA):\*\* Transposes dense data layout to maximize GPU global memory bandwidth.
 
@@ -42,7 +42,7 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 
 
-\### 3. High Precision \& Verification
+### 3. High Precision \& Verification
 
 \* \*\*Mixed Precision:\*\* Performs distance calculations in `float` for speed, but uses `double` Atomic operations for the Centroid Update step to minimize floating-point errors.
 
@@ -54,7 +54,7 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 
 
-\## 📊 Performance Benchmark
+## 📊 Performance Benchmark
 
 
 
@@ -88,7 +88,7 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 
 
-\## 🛠️ System Requirements
+## 🛠️ System Requirements
 
 
 
@@ -106,11 +106,11 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 
 
-\## 📦 Installation \& Setup
+## 📦 Installation \& Setup
 
 
 
-\### 1. Environment Setup (Recommended)
+### 1. Environment Setup (Recommended)
 
 We strongly recommend using a Conda environment for compatibility with RAPIDS (`cuml`).
 
@@ -120,35 +120,30 @@ We strongly recommend using a Conda environment for compatibility with RAPIDS (`
 
 \# Create Conda Environment (Python 3.11 \& CUDA 12.4)
 
-conda create -n rapids\_env -c rapidsai -c conda-forge -c nvidia \\
-
-&nbsp;   cuml=24.02 python=3.11 cuda-version=12.4 numpy scikit-learn
-
-
+conda create -n rapids\_env -c rapidsai -c conda-forge -c nvidia cuml=24.02 python=3.11 cuda-version=12.4 numpy scikit-learn
 
 \# Activate Environment
-
 conda activate rapids\_env
 
+```
 
-
+### 2. Run a data generator
+```bash
 \# run data\_generator.py
-
 python3 data\_generator.py
 
+```
 
-
+### 3. Run a script to test
+``` bash
 \# run run\_kmeans.sh
-
 chmod +x run\_all\_kmeans.sh
-
 ./run\_kmeans.sh
+```
 
-
-
-\# if you want to compile and run each cu file
-
+### if you want to compile and run each cu file
+``` bash
 nvcc -o kmeans mCSRKmeans.cu -O3 -arch=sm\_86
-
 ./mCSRKmeans
+```
 
