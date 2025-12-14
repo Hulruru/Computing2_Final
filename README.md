@@ -24,29 +24,29 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 ### 1. Adaptive Kernel Selection
 
-\* Automatically determines the execution mode by analyzing \*\*Sparsity\*\* upon data loading.
+* Automatically determines the execution mode by analyzing \*\*Sparsity\*\* upon data loading.
 
-&nbsp;   \* \*\*Dense Mode (Sparsity $\\le$ 80%):\*\* Executes logic optimized for memory coalesced access using SoA layout.
+&nbsp;   * \*\*Dense Mode (Sparsity $\\le$ 80%):\*\* Executes logic optimized for memory coalesced access using SoA layout.
 
-&nbsp;   \* \*\*Sparse Mode (Sparsity > 80%):\*\* Executes CSR-based logic to skip unnecessary zero-value computations.
+&nbsp;   * \*\*Sparse Mode (Sparsity > 80%):\*\* Executes CSR-based logic to skip unnecessary zero-value computations.
 
 
 
 ### 2. Advanced CUDA Optimizations
 
-\* \*\*Memory Coalescing (AoS $\\to$ SoA):\*\* Transposes dense data layout to maximize GPU global memory bandwidth.
+* **Memory Coalescing (AoS $\\to$ SoA):\*\* Transposes dense data layout to maximize GPU global memory bandwidth.
 
-\* \*\*Constant Memory:\*\* Caches read-only Centroids data in `\_\_constant\_\_` memory for every iteration to reduce lookup latency.
+* \*\*Constant Memory:\*\* Caches read-only Centroids data in `\_\_constant\_\_` memory for every iteration to reduce lookup latency.
 
-\* \*\*Shared Memory Reduction:\*\* Computes partial sums within thread blocks first to minimize contention during Global Atomic operations.
+* \*\*Shared Memory Reduction:\*\* Computes partial sums within thread blocks first to minimize contention during Global Atomic operations.
 
 
 
 ### 3. High Precision \& Verification
 
-\* \*\*Mixed Precision:\*\* Performs distance calculations in `float` for speed, but uses `double` Atomic operations for the Centroid Update step to minimize floating-point errors.
+* \*\*Mixed Precision:\*\* Performs distance calculations in `float` for speed, but uses `double` Atomic operations for the Centroid Update step to minimize floating-point errors.
 
-\* \*\*Validation:\*\* Verifies algorithm correctness by comparing MSE (Mean Squared Error) against `scikit-learn` CPU results.
+* \*\*Validation:\*\* Verifies algorithm correctness by comparing MSE (Mean Squared Error) against `scikit-learn` CPU results.
 
 
 
@@ -58,9 +58,9 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 
 
-\* \*\*Dataset:\*\* 10M Samples, 100 Features, 10 Clusters (Synthetic Data)
+* \*\*Dataset:\*\* 10M Samples, 100 Features, 10 Clusters (Synthetic Data)
 
-\* \*\*Hardware:\*\* NVIDIA GeForce RTX 3090 (24GB), CUDA 12.4
+* \*\*Hardware:\*\* NVIDIA GeForce RTX 3090 (24GB), CUDA 12.4
 
 
 
@@ -92,13 +92,13 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 
 
-\* \*\*OS:\*\* Linux (Ubuntu 20.04+ recommended)
+* \*\*OS:\*\* Linux (Ubuntu 20.04+ recommended)
 
-\* \*\*GPU:\*\* NVIDIA GPU (Compute Capability 8.0+ recommended, Tested on RTX 3090)
+* \*\*GPU:\*\* NVIDIA GPU (Compute Capability 8.0+ recommended, Tested on RTX 3090)
 
-\* \*\*Compiler:\*\* `nvcc` (CUDA Toolkit 12.4+), `g++`
+* \*\*Compiler:\*\* `nvcc` (CUDA Toolkit 12.4+), `g++`
 
-\* \*\*Python:\*\* 3.10 ~ 3.12 (for Data Gen \& Benchmarking)
+* \*\*Python:\*\* 3.10 ~ 3.12 (for Data Gen \& Benchmarking)
 
 
 
