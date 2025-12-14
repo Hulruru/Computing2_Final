@@ -1,4 +1,4 @@
-\# Batch Adaptive CUDA K-Means
+# Batch Adaptive CUDA K-Means
 
 
 
@@ -18,35 +18,35 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 
 
-\## 🚀 Key Features
+## 🚀 Key Features
 
 
 
-\### 1. Adaptive Kernel Selection
+### 1. Adaptive Kernel Selection
 
-\* Automatically determines the execution mode by analyzing \*\*Sparsity\*\* upon data loading.
+* Automatically determines the execution mode by analyzing \*\*Sparsity\*\* upon data loading.
 
-&nbsp;   \* \*\*Dense Mode (Sparsity $\\le$ 80%):\*\* Executes logic optimized for memory coalesced access using SoA layout.
+&nbsp;   * \*\*Dense Mode (Sparsity $\\le$ 80%):\*\* Executes logic optimized for memory coalesced access using SoA layout.
 
-&nbsp;   \* \*\*Sparse Mode (Sparsity > 80%):\*\* Executes CSR-based logic to skip unnecessary zero-value computations.
-
-
-
-\### 2. Advanced CUDA Optimizations
-
-\* \*\*Memory Coalescing (AoS $\\to$ SoA):\*\* Transposes dense data layout to maximize GPU global memory bandwidth.
-
-\* \*\*Constant Memory:\*\* Caches read-only Centroids data in `\_\_constant\_\_` memory for every iteration to reduce lookup latency.
-
-\* \*\*Shared Memory Reduction:\*\* Computes partial sums within thread blocks first to minimize contention during Global Atomic operations.
+&nbsp;   * \*\*Sparse Mode (Sparsity > 80%):\*\* Executes CSR-based logic to skip unnecessary zero-value computations.
 
 
 
-\### 3. High Precision \& Verification
+### 2. Advanced CUDA Optimizations
 
-\* \*\*Mixed Precision:\*\* Performs distance calculations in `float` for speed, but uses `double` Atomic operations for the Centroid Update step to minimize floating-point errors.
+* **Memory Coalescing (AoS $\\to$ SoA):\*\* Transposes dense data layout to maximize GPU global memory bandwidth.
 
-\* \*\*Validation:\*\* Verifies algorithm correctness by comparing MSE (Mean Squared Error) against `scikit-learn` CPU results.
+* \*\*Constant Memory:\*\* Caches read-only Centroids data in `\_\_constant\_\_` memory for every iteration to reduce lookup latency.
+
+* \*\*Shared Memory Reduction:\*\* Computes partial sums within thread blocks first to minimize contention during Global Atomic operations.
+
+
+
+### 3. High Precision \& Verification
+
+* \*\*Mixed Precision:\*\* Performs distance calculations in `float` for speed, but uses `double` Atomic operations for the Centroid Update step to minimize floating-point errors.
+
+* \*\*Validation:\*\* Verifies algorithm correctness by comparing MSE (Mean Squared Error) against `scikit-learn` CPU results.
 
 
 
@@ -54,13 +54,13 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 
 
-\## 📊 Performance Benchmark
+## 📊 Performance Benchmark
 
 
 
-\* \*\*Dataset:\*\* 10M Samples, 100 Features, 10 Clusters (Synthetic Data)
+* \*\*Dataset:\*\* 10M Samples, 100 Features, 10 Clusters (Synthetic Data)
 
-\* \*\*Hardware:\*\* NVIDIA GeForce RTX 3090 (24GB), CUDA 12.4
+* \*\*Hardware:\*\* NVIDIA GeForce RTX 3090 (24GB), CUDA 12.4
 
 
 
@@ -88,17 +88,17 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 
 
-\## 🛠️ System Requirements
+## 🛠️ System Requirements
 
 
 
-\* \*\*OS:\*\* Linux (Ubuntu 20.04+ recommended)
+* \*\*OS:\*\* Linux (Ubuntu 20.04+ recommended)
 
-\* \*\*GPU:\*\* NVIDIA GPU (Compute Capability 8.0+ recommended, Tested on RTX 3090)
+* \*\*GPU:\*\* NVIDIA GPU (Compute Capability 8.0+ recommended, Tested on RTX 3090)
 
-\* \*\*Compiler:\*\* `nvcc` (CUDA Toolkit 12.4+), `g++`
+* \*\*Compiler:\*\* `nvcc` (CUDA Toolkit 12.4+), `g++`
 
-\* \*\*Python:\*\* 3.10 ~ 3.12 (for Data Gen \& Benchmarking)
+* \*\*Python:\*\* 3.10 ~ 3.12 (for Data Gen \& Benchmarking)
 
 
 
@@ -106,11 +106,11 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 
 
-\## 📦 Installation \& Setup
+## 📦 Installation \& Setup
 
 
 
-\### 1. Environment Setup (Recommended)
+### 1. Environment Setup (Recommended)
 
 We strongly recommend using a Conda environment for compatibility with RAPIDS (`cuml`).
 
@@ -120,35 +120,30 @@ We strongly recommend using a Conda environment for compatibility with RAPIDS (`
 
 \# Create Conda Environment (Python 3.11 \& CUDA 12.4)
 
-conda create -n rapids\_env -c rapidsai -c conda-forge -c nvidia \\
-
-&nbsp;   cuml=24.02 python=3.11 cuda-version=12.4 numpy scikit-learn
-
-
+conda create -n rapids\_env -c rapidsai -c conda-forge -c nvidia cuml=24.02 python=3.11 cuda-version=12.4 numpy scikit-learn
 
 \# Activate Environment
-
 conda activate rapids\_env
 
+```
 
-
+### 2. Run a data generator
+```bash
 \# run data\_generator.py
-
 python3 data\_generator.py
 
+```
 
-
+### 3. Run a script to test
+``` bash
 \# run run\_kmeans.sh
-
 chmod +x run\_all\_kmeans.sh
-
 ./run\_kmeans.sh
+```
 
-
-
-\# if you want to compile and run each cu file
-
+### if you want to compile and run each cu file
+``` bash
 nvcc -o kmeans mCSRKmeans.cu -O3 -arch=sm\_86
-
 ./mCSRKmeans
+```
 
