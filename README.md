@@ -26,9 +26,9 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 * Automatically determines the execution mode by analyzing \*\*Sparsity\*\* upon data loading.
 
-&nbsp;   * \*\*Dense Mode (Sparsity $\\le$ 80%):\*\* Executes logic optimized for memory coalesced access using SoA layout.
+  * \*\*Dense Mode (Sparsity $\\le$ 80%):\*\* Executes logic optimized for memory coalesced access using SoA layout.
 
-&nbsp;   * \*\*Sparse Mode (Sparsity > 80%):\*\* Executes CSR-based logic to skip unnecessary zero-value computations.
+  * \*\*Sparse Mode (Sparsity > 80%):\*\* Executes CSR-based logic to skip unnecessary zero-value computations.
 
 
 
@@ -118,27 +118,26 @@ We strongly recommend using a Conda environment for compatibility with RAPIDS (`
 
 ```bash
 
-\# Create Conda Environment (Python 3.11 \& CUDA 12.4)
-
+# Create Conda Environment (Python 3.11 \& CUDA 12.4)
 conda create -n rapids_env -c rapidsai -c conda-forge -c nvidia cuml=24.02 python=3.11 cuda-version=12.4 numpy scikit-learn
 
-\# Activate Environment
+# Activate Environment
 conda activate rapids_env
 
 ```
 
 ### 2. Run a data generator
 ```bash
-\# run data_generator.py
+# run data_generator.py
 python3 data_generator.py
-
 ```
 
 ### 3. Run a script to test
 ``` bash
-\# run run_kmeans.sh
+# run run_kmeans.sh
 chmod +x run_all_kmeans.sh
 ./run_kmeans.sh
+
 ```
 
 ### if you want to compile and run each cu file
@@ -147,3 +146,12 @@ nvcc -o kmeans mCSRKmeans.cu -O3 -arch=sm_86
 ./mCSRKmeans
 ```
 
+### if you want to run sklearn_Kmeans
+``` bash
+python3 sklearn_KMeans.py
+```
+
+### if you want to run cuml_Kmeans for dataset 0~4
+``` bash
+python3 cuml_KMeans.py 0 5
+```
