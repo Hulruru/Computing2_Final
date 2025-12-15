@@ -1,5 +1,4 @@
 # Python K-Means Dataset Generation Dependencies
 numpy
 scikit-learn
-cuml
 cupy-cuda12x
