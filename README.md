@@ -36,7 +36,7 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 * **Memory Coalescing (AoS $\\to$ SoA):\*\* Transposes dense data layout to maximize GPU global memory bandwidth.
 
-* \*\*Constant Memory:\*\* Caches read-only Centroids data in `\_\_constant\_\_` memory for every iteration to reduce lookup latency.
+* \*\*Constant Memory:\*\* Caches read-only Centroids data in `__constant__` memory for every iteration to reduce lookup latency.
 
 * \*\*Shared Memory Reduction:\*\* Computes partial sums within thread blocks first to minimize contention during Global Atomic operations.
 
@@ -80,7 +80,7 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 
 
-> \*\*Result:\*\* Our Adaptive implementation demonstrated \*\*~2.1x faster performance\*\* than the commercial `cuML` library.
+\*\*Result:\*\* Our Adaptive implementation demonstrated \*\*~2.1x faster performance\*\* than the commercial `cuML` library.
 
 
 
