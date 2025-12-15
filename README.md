@@ -26,9 +26,9 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 * Automatically determines the execution mode by analyzing \*\*Sparsity\*\* upon data loading.
 
-&nbsp;   * \*\*Dense Mode (Sparsity $\\le$ 80%):\*\* Executes logic optimized for memory coalesced access using SoA layout.
+  * \*\*Dense Mode (Sparsity $\\le$ 80%):\*\* Executes logic optimized for memory coalesced access using SoA layout.
 
-&nbsp;   * \*\*Sparse Mode (Sparsity > 80%):\*\* Executes CSR-based logic to skip unnecessary zero-value computations.
+  * \*\*Sparse Mode (Sparsity > 80%):\*\* Executes CSR-based logic to skip unnecessary zero-value computations.
 
 
 
@@ -36,7 +36,7 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 * **Memory Coalescing (AoS $\\to$ SoA):\*\* Transposes dense data layout to maximize GPU global memory bandwidth.
 
-* \*\*Constant Memory:\*\* Caches read-only Centroids data in `\_\_constant\_\_` memory for every iteration to reduce lookup latency.
+* \*\*Constant Memory:\*\* Caches read-only Centroids data in `__constant__` memory for every iteration to reduce lookup latency.
 
 * \*\*Shared Memory Reduction:\*\* Computes partial sums within thread blocks first to minimize contention during Global Atomic operations.
 
@@ -80,7 +80,7 @@ We achieved over \*\*50x speedup\*\* compared to CPU-based libraries (`scikit-le
 
 
 
-> \*\*Result:\*\* Our Adaptive implementation demonstrated \*\*~2.1x faster performance\*\* than the commercial `cuML` library.
+\*\*Result:\*\* Our Adaptive implementation demonstrated \*\*~2.1x faster performance\*\* than the commercial `cuML` library.
 
 
 
@@ -118,32 +118,40 @@ We strongly recommend using a Conda environment for compatibility with RAPIDS (`
 
 ```bash
 
-\# Create Conda Environment (Python 3.11 \& CUDA 12.4)
+# Create Conda Environment (Python 3.11 \& CUDA 12.4)
+conda create -n rapids_env -c rapidsai -c conda-forge -c nvidia cuml=24.02 python=3.11 cuda-version=12.4 numpy scikit-learn
 
-conda create -n rapids\_env -c rapidsai -c conda-forge -c nvidia cuml=24.02 python=3.11 cuda-version=12.4 numpy scikit-learn
-
-\# Activate Environment
-conda activate rapids\_env
+# Activate Environment
+conda activate rapids_env
 
 ```
 
 ### 2. Run a data generator
 ```bash
-\# run data\_generator.py
-python3 data\_generator.py
-
+# run data_generator.py
+python3 data_generator.py
 ```
 
 ### 3. Run a script to test
 ``` bash
-\# run run\_kmeans.sh
-chmod +x run\_all\_kmeans.sh
-./run\_kmeans.sh
+# run run_kmeans.sh
+chmod +x run_all_kmeans.sh
+./run_kmeans.sh
+
 ```
 
 ### if you want to compile and run each cu file
 ``` bash
-nvcc -o kmeans mCSRKmeans.cu -O3 -arch=sm\_86
+nvcc -o kmeans mCSRKmeans.cu -O3 -arch=sm_86
 ./mCSRKmeans
 ```
 
+### if you want to run sklearn_Kmeans
+``` bash
+python3 sklearn_KMeans.py
+```
+
+### if you want to run cuml_Kmeans for dataset 0~4
+``` bash
+python3 cuml_KMeans.py 0 5
+```
