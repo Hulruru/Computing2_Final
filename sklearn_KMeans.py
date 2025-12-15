@@ -5,6 +5,7 @@ import glob
 from sklearn.cluster import KMeans
 
 def run_cpu_kmeans_batch(folder_path='dataset', output_folder='cpu_results', n_features=100, n_clusters=10):
+    # 1. 처리할 바이너리 데이터 파일 목록 탐색
     file_pattern = os.path.join(folder_path, "data_*.bin")
     files = sorted(glob.glob(file_pattern))
 
@@ -12,6 +13,7 @@ def run_cpu_kmeans_batch(folder_path='dataset', output_folder='cpu_results', n_f
         print(f"Error: No .bin files found in '{folder_path}'. Please run gen_data.py first.")
         return
 
+    # 결과 저장용 폴더 생성
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
         print(f"Created output directory: {output_folder}")
@@ -27,6 +29,7 @@ def run_cpu_kmeans_batch(folder_path='dataset', output_folder='cpu_results', n_f
         
         print(f"\nProcessing [{i+1}/{len(files)}]: {filename} ...")
 
+        # 2. 바이너리 데이터 로드 및 Reshape (1D Array -> 2D Matrix)
         try:
             X = np.fromfile(filepath, dtype=np.float32)
             X = X.reshape(-1, n_features)
@@ -36,12 +39,15 @@ def run_cpu_kmeans_batch(folder_path='dataset', output_folder='cpu_results', n_f
 
         n_samples = X.shape[0]
         
+        # 참고용: 데이터 희소도 계산 및 출력
         sparsity = 1.0 - (np.count_nonzero(X) / X.size)
-        print(f"   -> Shape: {X.shape} | Sparsity: {sparsity:.2%}")
+        print(f"    -> Shape: {X.shape} | Sparsity: {sparsity:.2%}")
 
+        # 3. K-Means 초기화
         init_centroids = X[:n_clusters] 
         kmeans = KMeans(n_clusters=n_clusters, init=init_centroids, n_init=1)
 
+        # 4. 학습 및 실행 시간 측정
         start_fit = time.time()
         kmeans.fit(X)
         end_fit = time.time()
@@ -49,16 +55,19 @@ def run_cpu_kmeans_batch(folder_path='dataset', output_folder='cpu_results', n_f
         duration_ms = (end_fit - start_fit) * 1000
         execution_times.append(duration_ms)
 
-        print(f"   -> Execution Time: {duration_ms:.4f} ms")
+        print(f"    -> Execution Time: {duration_ms:.4f} ms")
 
+        # 5. 결과 저장 (GPU 검증용 Ground Truth)
         labels_path = os.path.join(output_folder, f"labels_{file_idx}.txt")
         np.savetxt(labels_path, kmeans.labels_, fmt='%d')
         
+        # Centroids: 최종 중심점 좌표 (MSE 계산에 필수)
         centroids_path = os.path.join(output_folder, f"centroids_{file_idx}.txt")
         np.savetxt(centroids_path, kmeans.cluster_centers_, fmt='%.6f')
         
-        print(f"   -> Saved: {labels_path}, {centroids_path}")
+        print(f"    -> Saved: {labels_path}, {centroids_path}")
 
+    # 6. 전체 벤치마크 요약 출력
     if execution_times:
         avg_time = sum(execution_times) / len(execution_times)
         print("\n========================================")

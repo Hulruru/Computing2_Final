@@ -6,12 +6,16 @@ import os
 import time
 import sys
 
+# ==========================================
+# 설정 및 상수
+# ==========================================
 DATA_DIR = "dataset"
 N_FEATURES = 100
 N_CLUSTERS = 10
 MAX_ITER = 10
 
 def load_binary_data(filename, n_features):
+    """바이너리 파일에서 데이터를 로드하여 NumPy 배열로 반환"""
     try:
         data = np.fromfile(filename, dtype=np.float32)
     except FileNotFoundError:
@@ -28,11 +32,13 @@ def load_binary_data(filename, n_features):
 def run_benchmark(start_idx, end_idx):
     print(f"=== [Python cuML K-Means Benchmark (Pure Compute Time, Files {start_idx} to {end_idx})] ===")
     
+    # 1. GPU Warm-up
+    # 첫 실행 시 발생하는 CUDA Context 초기화 및 라이브러리 로딩 시간을 측정에서 배제
     print("Performing Warm-up...", end=" ")
     dummy_data = cp.random.rand(1000, N_FEATURES, dtype=np.float32)
     warmup_kmeans = KMeans(n_clusters=N_CLUSTERS, max_iter=1, init='random')
     warmup_kmeans.fit(dummy_data)
-    cp.cuda.Stream.null.synchronize()
+    cp.cuda.Stream.null.synchronize() # CUDA 동기화
     print("Done.\n")
     
     total_time = 0.0
@@ -48,38 +54,41 @@ def run_benchmark(start_idx, end_idx):
 
         print(f"Processing File [{file_idx}]: {filename}")
         
+        # 2. 데이터 로드 (CPU)
         data_cpu = load_binary_data(filename, N_FEATURES)
         if data_cpu is None: break
         
         n_samples = data_cpu.shape[0]
         
+        # 희소도 확인 (참고용 로그)
         zero_count = np.sum(np.abs(data_cpu) < 1e-6)
         sparsity = zero_count / data_cpu.size
-        print(f"   -> Samples: {n_samples}, Sparsity: {sparsity*100:.2f}%")
+        print(f"    -> Samples: {n_samples}, Sparsity: {sparsity*100:.2f}%")
 
+        # 3. 데이터 전송 (CPU -> GPU) 벤치마크 시간 측정에서 제외 (알고리즘 순수 성능 비교 목적)
         data_gpu = cp.array(data_cpu)
 
+        # cuML 모델 설정
         kmeans = KMeans(n_clusters=N_CLUSTERS, 
                         max_iter=MAX_ITER, 
                         init='random', 
                         output_type='numpy') 
 
-        cp.cuda.Stream.null.synchronize()
+        # 4. 성능 측정 (Pure Compute Time)
+        cp.cuda.Stream.null.synchronize() # 이전 작업 완료 대기
         
         start_time = time.perf_counter()
-        
-        kmeans.fit(data_gpu)
-        
-        cp.cuda.Stream.null.synchronize()
-        
+        kmeans.fit(data_gpu)              # K-Means 실행
+        cp.cuda.Stream.null.synchronize() # 커널 실행 완료 대기 (필수)
         end_time = time.perf_counter()
         
         elapsed_ms = (end_time - start_time) * 1000
-        print(f"   -> Pure Compute Time: {elapsed_ms:.4f} ms")
+        print(f"    -> Pure Compute Time: {elapsed_ms:.4f} ms")
         
         total_time += elapsed_ms
         success_count += 1
     
+    # 결과 요약 출력
     if success_count > 0:
         last_processed_idx = file_idx if file_idx <= end_idx and os.path.exists(os.path.join(DATA_DIR, f"data_{file_idx}.bin")) else file_idx - 1
 
