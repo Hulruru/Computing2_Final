@@ -142,7 +142,7 @@ chmod +x run_all_kmeans.sh
 
 ### if you want to compile and run each cu file
 ``` bash
-nvcc -o kmeans mCSRKmeans.cu -O3 -arch=sm_86
+nvcc -o kmeans mCSRKmeans.cu -arch=sm_86
 ./mCSRKmeans
 ```
 
