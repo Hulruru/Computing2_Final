@@ -25,16 +25,15 @@ TOTAL_BATCHES=6
 # ========================================
 
 mkdir -p ${RESULT_DIR}
-# ================= sklearn K-means =================
-python3 "sklearn_KMeans.py" ${CUMUL_RESULT_FILE} 2>&1
+
 # ================= CUDA K-means =================
-${NVCC} ${SRC1} -o ${EXE1} -O3 -arch=sm_86
+${NVCC} ${SRC1} -o ${EXE1} -arch=sm_86
 ./${EXE1} > ${RESULT_DIR}/naive_result.txt
 
-${NVCC} ${SRC2} -o ${EXE2} -O3 -arch=sm_86
+${NVCC} ${SRC2} -o ${EXE2} -arch=sm_86
 ./${EXE2} > ${RESULT_DIR}/soa_result.txt
 
-${NVCC} ${SRC3} -o ${EXE3} -O3 -arch=sm_86
+${NVCC} ${SRC3} -o ${EXE3} -arch=sm_86
 ./${EXE3} > ${RESULT_DIR}/csr_result.txt
 
 # ================= cuML K-means =================

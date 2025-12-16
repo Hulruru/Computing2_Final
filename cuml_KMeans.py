@@ -33,12 +33,12 @@ def run_benchmark(start_idx, end_idx):
     print(f"=== [Python cuML K-Means Benchmark (Pure Compute Time, Files {start_idx} to {end_idx})] ===")
     
     # 1. GPU Warm-up
-    # 첫 실행 시 발생하는 CUDA Context 초기화 및 라이브러리 로딩 시간을 측정에서 배제
     print("Performing Warm-up...", end=" ")
     dummy_data = cp.random.rand(1000, N_FEATURES, dtype=np.float32)
-    warmup_kmeans = KMeans(n_clusters=N_CLUSTERS, max_iter=1, init='random')
+    # Warm-up은 빠르게 통과
+    warmup_kmeans = KMeans(n_clusters=N_CLUSTERS, max_iter=1, init='random', n_init=1)
     warmup_kmeans.fit(dummy_data)
-    cp.cuda.Stream.null.synchronize() # CUDA 동기화
+    cp.cuda.Stream.null.synchronize()
     print("Done.\n")
     
     total_time = 0.0
@@ -60,26 +60,31 @@ def run_benchmark(start_idx, end_idx):
         
         n_samples = data_cpu.shape[0]
         
-        # 희소도 확인 (참고용 로그)
+        # 희소도 확인
         zero_count = np.sum(np.abs(data_cpu) < 1e-6)
         sparsity = zero_count / data_cpu.size
         print(f"    -> Samples: {n_samples}, Sparsity: {sparsity*100:.2f}%")
 
-        # 3. 데이터 전송 (CPU -> GPU) 벤치마크 시간 측정에서 제외 (알고리즘 순수 성능 비교 목적)
+        # 3. 데이터 전송 (CPU -> GPU)
         data_gpu = cp.array(data_cpu)
+
+        init_centroids = data_gpu[:N_CLUSTERS]
 
         # cuML 모델 설정
         kmeans = KMeans(n_clusters=N_CLUSTERS, 
                         max_iter=MAX_ITER, 
-                        init='random', 
+                        tol=1e-20,
+                        n_init=1,
+                        init=init_centroids, # 고정된 초기값 전달
                         output_type='numpy') 
 
         # 4. 성능 측정 (Pure Compute Time)
-        cp.cuda.Stream.null.synchronize() # 이전 작업 완료 대기
+        cp.cuda.Stream.null.synchronize()
         
         start_time = time.perf_counter()
-        kmeans.fit(data_gpu)              # K-Means 실행
-        cp.cuda.Stream.null.synchronize() # 커널 실행 완료 대기 (필수)
+        kmeans.fit(data_gpu)
+        cp.cuda.Stream.null.synchronize()
+        
         end_time = time.perf_counter()
         
         elapsed_ms = (end_time - start_time) * 1000
@@ -88,7 +93,7 @@ def run_benchmark(start_idx, end_idx):
         total_time += elapsed_ms
         success_count += 1
     
-    # 결과 요약 출력
+    # 결과 요약
     if success_count > 0:
         last_processed_idx = file_idx if file_idx <= end_idx and os.path.exists(os.path.join(DATA_DIR, f"data_{file_idx}.bin")) else file_idx - 1
 
@@ -110,16 +115,13 @@ if __name__ == "__main__":
             end_index = int(sys.argv[2])
             
             if start_index < 0 or end_index < start_index:
-                raise ValueError("Invalid range. Start index must be non-negative and less than or equal to end index.")
+                raise ValueError("Invalid range.")
                 
             run_benchmark(start_index, end_index)
             
         except ValueError as e:
-            print(f"Error: Invalid arguments. Both arguments must be integers. {e}")
-            print(f"Usage: python3 <script_name>.py <start_file_index> <end_file_index>")
+            print(f"Error: {e}")
             sys.exit(1)
-            
     else:
-        print("Error: Two integer arguments are required: <start_file_index> and <end_file_index>.")
-        print("Example: python3 cumltest.py 0 4 (Processes data_0.bin to data_4.bin)")
+        print("Usage: python3 cuml_KMeans.py <start_idx> <end_idx>")
         sys.exit(1)
