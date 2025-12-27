@@ -119,7 +119,7 @@ We strongly recommend using a Conda environment for compatibility with RAPIDS (`
 ```bash
 
 # Create Conda Environment (Python 3.11 \& CUDA 12.4)
-conda create -n rapids_env -c rapidsai -c conda-forge -c nvidia cuml=24.02 python=3.11 cuda-version=12.4 numpy scikit-learn
+conda create -n rapids_env -c rapidsai -c conda-forge -c nvidia cuml=24.12 python=3.11 cuda-version=12.2 numpy scikit-learn
 
 # Activate Environment
 conda activate rapids_env
